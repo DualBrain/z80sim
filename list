@@ -1,0 +1,63 @@
+# File code.asm
+0000			;  
+0000			;   SYSTEM MEMORY MAP  
+0000			;   0x0000 - 0x3777     BOOT ROM  
+0000			;   0x4000 - 0x7FFF     SYSTEM RAM  
+0000			;   0x8000 - 0xFFFF     USER RAM  
+0000			;  
+0000			;  
+0000			;  
+0000			;  
+0000			;   SYSTEM RAM MAP  
+0000			;   0x4000  
+0000			;   |      
+0000			;   |   CompactFlash Page Buffer  
+0000			;   |  
+0000			;   0x41FF  
+0000			;   0x4200  
+0000			;  
+0000			;  
+0000			;  
+0000			;  
+0000			;  
+0000			;  
+0000			;  
+0000			  
+0000			  
+0000			;TOP OF BOOT ROM  
+0000			org 0x0000  
+0000			  
+0000			sysinit:  
+0000 31 00 00		    LD SP, 0x0000       ;Initialize SP to 0x0000.  Will wrap around to 0xFFFE on first PUSH  
+0003 db 00		    IN A, (0x00)  
+0005 21 1c 00		    LD HL, message_hello  
+0008 cd 0f 00		    CALL sys_write_string  
+000b 76			    HALT  
+000c			  
+000c			  
+000c			;sys_write_char WRITE CHARACTER TO SERIAL OUT  
+000c			;Char to print passed in A  
+000c			sys_write_char:  
+000c d3 00		    OUT (0x00), A  
+000e c9			    RET  
+000f			  
+000f			;sys_writestring WRITE A NULL TERMINATED STRING TO SERIAL OUT  
+000f			;Address of first char in string passed in HL  
+000f			sys_write_string:  
+000f 7e			    LD A, (HL)  
+0010 fe 00		    CP 0  
+0012 c8			    RET Z  
+0013 d3 00		    OUT (0x00), A  
+0015 23			    INC HL  
+0016 c3 0f 00		    JP sys_write_string  
+0019			  
+0019			;sys_read_char READ A SINGLE CHARACTER FROM SERIAL IN  
+0019			;Value of read character returned in A  
+0019			;Null (0x00) is returned if no data is available  
+0019			sys_read_char:  
+0019 db 00		    IN A, (0x00)  
+001b c9			    RET  
+001c			  
+001c ..			message_hello: defm "Hello World!\0"
+# End of file code.asm
+0029
