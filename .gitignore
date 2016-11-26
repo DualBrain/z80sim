@@ -1,7 +1,3 @@
 project.lock.json
-code.bin
-code.asm
-list
-label
 \bin
 \obj
