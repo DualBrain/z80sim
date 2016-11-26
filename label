@@ -1,5 +1,0 @@
-message_hello:	equ $001c
-sys_read_char:	equ $0019
-sys_write_char:	equ $000c
-sys_write_string:	equ $000f
-sysinit:	equ $0000
