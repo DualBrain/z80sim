@@ -1,5 +1,7 @@
 project.json
 code.bin
 code.asm
+list
+label
 \bin
 \obj
