@@ -33,17 +33,25 @@ namespace ConsoleApplication
             var cpu = new Z80(mem, ports);
 
             Console.WriteLine("Starting CPU" + Environment.NewLine);
+            Console.WriteLine("Press 'T' to terminate emulation" + Environment.NewLine);
+            //Console.WriteLine("Press 'S' to single step and 'R' to run continuously" + Environment.NewLine);
+
+            ConsoleKeyInfo keystroke;
+            bool singleStep = true;
             while(!cpu.Halt)
             {
                 Console.WriteLine(cpu.DumpState());
-                while(Console.Read() == -1) {}
+                keystroke = Console.ReadKey(true);
+
+                if(keystroke.Key == ConsoleKey.T)
+                {
+                    Console.WriteLine("Terminating emulation" + Environment.NewLine);
+                    break;
+                }
+
                 cpu.Parse();
-                //Console.WriteLine(Environment.NewLine + "Single stepped, dumping state:");
                 
             }
-
-            Console.WriteLine(Environment.NewLine + "CPU Halted, dumping state:");
-            Console.WriteLine(cpu.DumpState());
 
             Console.WriteLine("Press RETURN to exit.");
             while(Console.Read() == -1) {}
