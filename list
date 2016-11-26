@@ -1,0 +1,8 @@
+# File code.asm
+0000			top:  
+0000 3e 04		    LD A, 4  
+0002 c6 03		    ADD 3  
+0004 c3 00 00		    JP top  
+0007			    
+# End of file code.asm
+0007
