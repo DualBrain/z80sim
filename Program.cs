@@ -8,6 +8,24 @@ namespace ConsoleApplication
     {
         public static void Main(string[] args)
         {
+            Console.WriteLine("Loading Breakpoints");
+            Int16[] breakpointArray = new Int16[256];
+            try
+            {
+                StreamReader breakpointsFileReader = new StreamReader(File.OpenRead("breakpoints"));
+                int i = 0;
+                while(!breakpointsFileReader.EndOfStream)
+                {
+                    breakpointArray[i] = Int16.Parse(breakpointsFileReader.ReadLine());
+                    i++;
+                }
+                
+            }
+            catch(System.Exception)
+            {
+                Console.WriteLine("Unable to read file 'breakpoints'");
+            }
+
             Console.WriteLine("Initializing memory");
             var ram = new byte[65536];
             Array.Clear(ram, 0, ram.Length);
@@ -33,23 +51,54 @@ namespace ConsoleApplication
             var cpu = new Z80(mem, ports);
 
             Console.WriteLine("Starting CPU" + Environment.NewLine);
-            Console.WriteLine("Press 'T' to terminate emulation" + Environment.NewLine);
-            //Console.WriteLine("Press 'S' to single step and 'R' to run continuously" + Environment.NewLine);
+            Console.WriteLine("Press 'T' to terminate emulation");
+            Console.WriteLine("Press 'S' to single step and 'R' to run continuously" + Environment.NewLine);
 
             ConsoleKeyInfo keystroke;
             bool singleStep = true;
-            while(!cpu.Halt)
+            bool running = true;
+            int curPC = 0;
+            while(running)
             {
-                Console.WriteLine(cpu.DumpState());
-                keystroke = Console.ReadKey(true);
-
-                if(keystroke.Key == ConsoleKey.T)
+                curPC = (cpu.GetState()[24]*256) + cpu.GetState()[25];
+                foreach (int i in breakpointArray)
                 {
-                    Console.WriteLine("Terminating emulation" + Environment.NewLine);
-                    break;
+                    if (i == curPC)
+                    {
+                        Console.WriteLine("Breakpoint hit, pausing");
+                        singleStep = true;
+                    }
+                }
+
+                if(singleStep)
+                {
+                    Console.WriteLine(cpu.DumpState());
+                    keystroke = Console.ReadKey(true);
+
+                    if(keystroke.Key == ConsoleKey.S)
+                    {
+                        Console.WriteLine("Single stepping" + Environment.NewLine);
+                        singleStep = true;
+                    }
+                    else if(keystroke.Key == ConsoleKey.R)
+                    {
+                        Console.WriteLine("Running free" + Environment.NewLine);
+                        singleStep = false;
+                    }
+                    else  if(keystroke.Key == ConsoleKey.T)
+                    {
+                        Console.WriteLine("Terminating emulation" + Environment.NewLine);
+                        break;
+                    }
                 }
 
                 cpu.Parse();
+
+                if(cpu.Halt)
+                {
+                    Console.WriteLine("Halt executed, pausing simulation" + Environment.NewLine);
+                    singleStep = true;
+                }
                 
             }
 
