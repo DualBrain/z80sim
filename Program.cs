@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using z80;
 
@@ -9,15 +10,13 @@ namespace ConsoleApplication
         public static void Main(string[] args)
         {
             Console.WriteLine("Loading Breakpoints");
-            Int16[] breakpointArray = new Int16[256];
+            LinkedList<Int16> breakpointList = new LinkedList<Int16>();
             try
             {
                 StreamReader breakpointsFileReader = new StreamReader(File.OpenRead("breakpoints"));
-                int i = 0;
                 while(!breakpointsFileReader.EndOfStream)
                 {
-                    breakpointArray[i] = Int16.Parse(breakpointsFileReader.ReadLine());
-                    i++;
+                    breakpointList.AddLast(Int16.Parse(breakpointsFileReader.ReadLine()));
                 }
                 
             }
@@ -61,7 +60,7 @@ namespace ConsoleApplication
             while(running)
             {
                 curPC = (cpu.GetState()[24]*256) + cpu.GetState()[25];
-                foreach (int i in breakpointArray)
+                foreach (int i in breakpointList)
                 {
                     if (i == curPC)
                     {
